@@ -4,6 +4,8 @@ from PIL import Image, ImageTk
 import cv2
 from FaceDetector import FaceDetector
 from BubbleOverlay import BubbleOverlay
+from GameControl import GameControl
+from WinGame import WinGame
 
 class HangmanGame:
     def __init__(self):
@@ -30,6 +32,12 @@ class HangmanGame:
         # Setup webcam and video loop
         self.cap = cv2.VideoCapture(0)
         self.update_video()
+
+        # Game Over
+        self.game_control = GameControl("GameOver.jpg")
+
+        # Game Won
+        self.game_won = WinGame("Crown.png", "Firework.png")
 
     def setup_gui(self):
 
@@ -103,10 +111,32 @@ class HangmanGame:
             self.cap.release()
 
     def end_game(self, won):
+        # Disable all buttons
         for widget in self.buttons_frame.winfo_children():
             widget.config(state="disabled")
+
+        # Show win or loss message
         win_lose_text = "Congratulations, you won!" if won else f"You lost! The word was: {self.selected_word}"
         tk.Label(self.window, text=win_lose_text, font=("Helvetica", 20)).pack()
+
+        if won:
+            self.window.destroy()
+            # Get the last known face coordinates or use some default
+            cv2.waitKey(500)
+            self.game_won.transition_to_win_screen(self.cap, self.face_detector)
+            self.game_won.end_game()
+
+        else:
+            self.window.destroy()
+
+            # Wait before starting the transition
+            cv2.waitKey(500)
+
+            self.game_control.transition_to_game_over(self.cap, self.selected_word)
+            self.game_control.end_game()
+            self.cap.release()
+
+
 
 
 if __name__ == "__main__":
