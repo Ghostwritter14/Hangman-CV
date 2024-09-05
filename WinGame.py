@@ -11,7 +11,6 @@ class WinGame:
             raise FileNotFoundError("One or more image assets could not be loaded.")
 
     def place_crown(self, frame, face_coordinates):
-        # Directly unpack the face_coordinates tuple
         x, y, w, h = face_coordinates
 
         # Resize the crown image to fit the width `w` and height `h // 2`
@@ -19,16 +18,13 @@ class WinGame:
 
         # Calculate the position to place the crown, accounting for the height of the crown
         crown_x = x
-        crown_y = y - h // 2  # Place the crown above the detected face
+        crown_y = y - h // 2  # crown placed over the head
 
-        # Extract the alpha channel from the crown image
         crown_alpha = crown_resized[:, :, 3] / 255.0
         inverted_alpha = 1 - crown_alpha
 
-        # Ensure the y position is not negative
         crown_y = max(crown_y, 0)
 
-        # Overlay the crown onto the frame
         for c in range(0, 3):
             frame[crown_y:crown_y + h // 2, crown_x:crown_x + w, c] = (
                     crown_alpha * crown_resized[:, :, c] +
@@ -40,7 +36,6 @@ class WinGame:
         alpha = step / total_steps
         h, w = firework_resized.shape[:2]
 
-        # Define positions for fireworks
         positions = [
             (0, 0),
             (frame.shape[1] - w, 0),
@@ -49,7 +44,6 @@ class WinGame:
         ]
 
         for pos in positions:
-            # Separate the alpha channel
             firework_alpha = firework_resized[:, :, 3] / 255.0
             firework_image = firework_resized[:, :, :3]
 
@@ -89,7 +83,6 @@ class WinGame:
             if faces is not None and len(faces) > 0:
                 frame = self.place_crown(frame, faces[0])
 
-            # Display the frame
             cv2.imshow('Frame', frame)
             cv2.waitKey(delay)
 

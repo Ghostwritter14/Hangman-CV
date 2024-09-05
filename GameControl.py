@@ -21,7 +21,6 @@ class GameControl:
             cv2.imshow('Game Over', blended_frame)
             cv2.waitKey(int(1000 / steps))
 
-        # show final message
         self.show_final_message(game_over_resized, word)
 
     def show_final_message(self, final_frame, word):
